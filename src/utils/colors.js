@@ -1,0 +1,20 @@
+export const colorsEnum = {
+    grass: '#16c172',
+    fire: '#ef271b',
+    water: '#4361ee',
+    bug: '#059669',
+    dragon: '#2ec4b6',
+    steel: '#73e2a7',
+    dark: '#434649',
+    flying: '#8b9cad',
+    normal: '#c18cba',
+    ghost: '#9a54a1',
+    rock: '#63320b',
+    ground: '#885629',
+    fighting: '#c75000',
+    electric: '#ffbf00',
+    poison: '#6e44ff',
+    psychic: '#db00b6',
+    fairy: '#ee4268',
+    ice: '#90e0ef'
+}
