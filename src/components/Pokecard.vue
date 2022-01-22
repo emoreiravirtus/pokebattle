@@ -1,5 +1,5 @@
 <template>
-    <div class="card" :style="{ 'background-image': gradientColor }" @click="spotlightPokemon">
+    <div class="card" :style="[{ 'background-image': gradientColor }, cssVars]" @click="spotlightPokemon">
         <div class="image-container">
             <img :src="pokemon.sprites.front_default" :alt="pokemon.name + 'image'">
         </div>
@@ -46,13 +46,19 @@ export default {
             document.querySelector('.card').focus;
             setTimeout(() => {
                 this.$store.dispatch('spotlightPokemon', this.pokemon);
-            }, 1000);
+            }, 2000);
         }
     },
     computed: {
         gradientColor() {
             let pokemonType = this.pokemon.types[0].type.name;
             return 'linear-gradient(160deg, ' + colorsEnum[pokemonType] +' 0%, #480060 100%)';
+        },
+        cssVars() {
+            let pokemonType = this.pokemon.types[0].type.name;
+            return {
+                '--type-color': colorsEnum[pokemonType]
+            }
         }
     }
 }
@@ -73,7 +79,7 @@ export default {
     }
 
     &:hover img {
-        transform: skew(-12deg) scale(1.5);
+        animation: 4s ease-in breath infinite;
     }
 
 
@@ -127,6 +133,50 @@ export default {
                 }
             }
         }
+    }
+}
+
+@keyframes breath {
+    0%{
+        transform: skew(0deg) scale(1);
+    }
+
+    10% {
+        transform: translateY(-30px) scale(1.4);
+        -webkit-filter: drop-shadow(18px -1px 0px var(--type-color));
+        filter: drop-shadow(18px -1px 0px var(--type-color));
+    }
+
+    15% {
+        transform: translateY(0px) scale(2);
+        -webkit-filter: drop-shadow(18px -1px 0px var(--type-color));
+        filter: drop-shadow(18px -1px 0px var(--type-color));
+    }
+
+    25% {
+        transform: skew(20deg) translateY(0px) translateX(-40px) scale(2);
+        -webkit-filter: drop-shadow(40px -1px 0px var(--type-color));
+        filter: drop-shadow(40px -1px 0px var(--type-color));
+    }
+
+    40% {
+        transform: skew(0deg) translateY(0px) scale(2);
+        -webkit-filter: drop-shadow(8px -1px 0px #fff);
+        filter: drop-shadow(8px -1px 0px #fff);
+    }
+
+    50% {
+        transform: skew(4deg) translateY(0px) scale(2);
+        -webkit-filter: drop-shadow(8px -1px 0px var(--type-color));
+        filter: drop-shadow(8px -1px 0px var(--type-color));
+    }
+
+    75% {
+        transform: translateY(-20px) scale(2);
+    }
+
+    100% {
+        transform: skew(0deg) scale(1);
     }
 }
 </style>

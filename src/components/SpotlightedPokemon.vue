@@ -67,8 +67,12 @@ export default {
             }
         }
     },
+    beforeCreate() {
+        document.querySelector('html').style.overflow = 'hidden';
+    },
     methods: {
         turnSpotlightOff() {
+            document.querySelector('html').style.overflow = 'unset';
             this.$store.dispatch('turnSpotlightOff');
         }
     },
@@ -82,6 +86,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 .spotlighted-pokemon-container {
     position: fixed;
     background-color: #fff;

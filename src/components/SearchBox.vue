@@ -6,18 +6,18 @@
       </span>
       <input
         class="search-box-input normal-font"
-        @keydown.enter="searchPokemon"
-        @input="suggestPokemonName"
+        :class="{'error': notFound}"
         type="text"
         placeholder="E.g. Pikachu"
         v-model="searchTerm"
       />
-      <button class="search-box-button normal-font" @click="searchPokemon">
+      <p class="reset-input bold-font" v-if="searchTerm" @click="reset">X</p>
+      <button class="search-box-button normal-font" @click="checkPokemonName()">
         Go
       </button>
     </div>
 
-    <ul class="autocomplete-results" v-if="suggestionsOpen">
+    <ul class="autocomplete-results" v-if="suggestions">
       <li
         class="autocomplete-result normal-font"
         v-for="(suggestion, index) in suggestions"
@@ -38,48 +38,75 @@ export default {
   data() {
     return {
       searchTerm: null,
-      notFound: false,
       allPokemonNames: pokemon.all(),
-      suggestions: [],
-      suggestionsOpen: false,
+      suggestions: null,
+      notFound: false
     };
   },
   methods: {
-    async searchPokemon() {
-      await this.$store.dispatch("searchSpecificPokemon", this.searchTerm).then(
-        () => {
-          this.searchTerm = null;
-        },
-        (error) => {
-          console.log(error);
-          this.notFount = true;
-        }
-      );
+    async searchPokemon(autocomplete = false) {
+      let pokemonName = autocomplete ? pokemonName = this.suggestions[0] : this.searchTerm;
+
+      await this.$store.dispatch("searchSpecificPokemon", pokemonName.toLowerCase())
+      this.searchTerm = null;
+      this.suggestions = null;
+      this.notFound = false;
     },
     filterResults() {
-      console.log(this.allPokemonNames);
-      this.suggestions = this.allPokemonNames.filter((item) => {
+      let result = this.allPokemonNames.filter((item) => {
         return item.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1;
       });
+      result ? this.suggestions = result : this.suggestions = null;
     },
     suggestPokemonName() {
       this.filterResults();
-      this.suggestionsOpen = true;
     },
     setSearchTerm(suggestion) {
       this.searchTerm = suggestion.toLowerCase();
       this.searchPokemon();
-      this.suggestionsOpen = false;
     },
+    reset() {
+      this.searchTerm = null;
+      this.suggestions = null;
+      this.notFound = false;
+    },
+    checkPokemonName() {
+      this.filterResults();
+
+      this.suggestions.length > 0 ? this.searchPokemon(true) : this.notFound = true;
+    }
   },
+  watch: {
+    searchTerm() {
+      if ( this.searchTerm ) {
+        this.suggestPokemonName();
+      }
+    }
+  }
 };
 </script>
 
 <style lang="scss">
+.error {
+  border: 2px solid red !important; 
+}
+
 .search-box-container {
   display: flex;
   justify-content: center;
   position: relative;
+  
+  .reset-input {
+    color: #aaaaaa;
+    cursor: pointer;
+    top: -6px;
+    right: 60px;
+    position: absolute;
+    border: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 10px;
+  }
 
   .input {
     z-index: 2;
