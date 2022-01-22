@@ -1,4 +1,4 @@
-# pokebattle
+# pokebattle check the result [HERE](https://pokemonbattle-acccf.web.app/)
 
 ## Project setup
 ```
