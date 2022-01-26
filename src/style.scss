@@ -1,7 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;400&display=swap');
 
-$primary-color: #2a75bb;
-$font-color: #fff;
+$primary-color: #2196f3;
+$font-color: rgb(66, 66, 66);
+
+a {
+    text-decoration: none;
+    color: $primary-color;
+}
+
+.white-color {
+    color: #fff !important;
+}
 
 .normal-font {
     font-family: 'Josefin Sans', sans-serif;
@@ -12,6 +21,13 @@ $font-color: #fff;
 .bold-font {
     font-family: 'Josefin Sans', sans-serif;
     font-size: 18px;
+    font-weight: 700;
+    color: $font-color;
+}
+
+.big-font {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 28px;
     font-weight: 700;
     color: $font-color;
 }
@@ -28,3 +44,37 @@ $font-color: #fff;
     -webkit-text-fill-color: transparent;
 }
 
+.back-button {
+    border: none;
+    border-radius: 100%;
+    width: 31px;
+    text-align: center;
+    box-shadow: rgb(100 100 111 / 20%) 0px 7px 29px 0px;
+    position: fixed;
+    top: 14px;
+    height: 31px;
+    left: 15px;
+    cursor: pointer;
+    background: #2196f3;
+    padding-right: 8px;
+    z-index: 5;
+
+    img {
+        width: 12px;
+        height: 15px;
+    }
+}
+
+.error-background {
+    background-color: #f44336;
+    color: #fff;
+}
+.success-background {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+.primary-background{
+    background-color: $primary-color;
+    color: #fff;
+}

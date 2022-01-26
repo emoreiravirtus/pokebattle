@@ -95,6 +95,7 @@ export default {
   display: flex;
   justify-content: center;
   position: relative;
+  z-index: 2;
   
   .reset-input {
     color: #aaaaaa;
@@ -109,7 +110,6 @@ export default {
   }
 
   .input {
-    z-index: 2;
 
     .search-box-input {
       box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -121,6 +121,10 @@ export default {
       color: #aaaaaa;
       padding: 0 60px;
       font-size: 16px;
+
+      @media (max-width: 480px), (min-width: 481px) and (max-width: 767px) {
+        width: 140px;
+      }
 
       &::placeholder {
         color: #aaa;
@@ -166,14 +170,17 @@ export default {
     background: #fff;
     margin: -10px;
     padding: 29px 0 0 0;
-    width: 360px;
+    width: 100%;
+
+    li {
+      padding: 0 46px;
+    }
 
     li:nth-child(odd) {
       cursor: pointer;
       background-color: #fafafa;
-      color: #333;
+      color: rgb(63, 57, 57);
       list-style: none;
-      padding: 10px 0;
     }
 
     li:hover > * {

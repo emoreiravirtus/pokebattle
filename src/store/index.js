@@ -11,7 +11,8 @@ export default createStore({
   mutations: {
     addPokemonToList: (state, pokemon) => state.pokemons.push( pokemon ),
     spotlightPokemon: (state, data) => state.spotlightedPokemon = { spotlighted: true, data },
-    turnSpotlightOff: state => state.spotlightedPokemon = { spotlighted: false, data: '' }
+    turnSpotlightOff: state => state.spotlightedPokemon = { spotlighted: false, data: '' },
+    cleanPokemons: state => state.pokemons = []
   },
   getters: {
     allPokemons: state => state.pokemons,
@@ -44,6 +45,23 @@ export default createStore({
               })
           }
         })
+    },
+    async getNRandomPokemons(context, n) {
+      let randomList = Array.from({length: n}, () => Math.floor(Math.random() * 898));
+      let nRandomPokemonsData = []
+
+      for (let item of randomList) {
+        await fetch(`${url}/pokemon/${item}`)
+          .then( async response => {
+            const pokemon = await response.json();
+            nRandomPokemonsData.push(pokemon);
+          })
+      }
+
+      return nRandomPokemonsData
+    },
+    cleanPokemons( context ) {
+      context.commit('cleanPokemons');
     },
     searchSpecificPokemon( context, pokemonName ) {
       fetch(`${url}/pokemon/${pokemonName}`)

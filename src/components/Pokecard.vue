@@ -1,13 +1,13 @@
 <template>
-    <div class="card" :style="[{ 'background-image': gradientColor }, cssVars]" @click="spotlightPokemon">
+    <div class="pokecard" :style="[{ 'background-image': gradientColor }, cssVars]" @click="spotlightPokemon">
         <div class="image-container">
             <img :src="pokemon.sprites.front_default" :alt="pokemon.name + 'image'">
         </div>
         <div class="info-container">
-            <p class="bold-font">{{ pokemon.name }}</p>
+            <p class="bold-font white-color">{{ pokemon.name }}</p>
             <div class="main-info-container">
                 <div class="types-container">
-                    <p class="normal-font" 
+                    <p class="normal-font white-color" 
                         v-for="(type, index) in pokemon.types"
                         :key="index">
                             {{ type.type.name }}
@@ -15,7 +15,7 @@
                 </div>
                 <div class="skills-container">
                     <div class="stat" v-for="(stat, index) in pokemon.stats.slice(0, 3)" :key="index">
-                        <p class="small-font">{{ stat.stat.name }}</p>
+                        <p class="small-font white-color">{{ stat.stat.name }}</p>
                         <progress-bar :progress="stat.base_stat"></progress-bar>
                     </div>
                 </div>
@@ -39,13 +39,20 @@ export default {
             default: () => {
                 return { name: 'Pikachu' };
             }
+        },
+        indexNumber: {
+            type: Number,
+            default: () => {
+                return 0;
+            }
         }
     },
     methods: {
         spotlightPokemon() {
-            document.querySelector('.card').focus;
+            document.querySelectorAll('.pokecard img')[this.indexNumber].style = 'animation: 4s ease-in breath infinite';
             setTimeout(() => {
                 this.$store.dispatch('spotlightPokemon', this.pokemon);
+                document.querySelectorAll('.pokecard img')[this.indexNumber].style = 'animation: unset';
             }, 2000);
         }
     },
@@ -65,7 +72,7 @@ export default {
 </script>
 
 <style lang="scss">
-.card {
+.pokecard {
     border-radius: 10px;
     margin: 10px 0;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -73,14 +80,13 @@ export default {
     flex-direction: row;
     cursor: pointer;
     transition: transform .4s;
+    z-index: 0;
 
     &:hover {
         transform: scale(1.1);
     }
 
-    &:hover img {
-        animation: 4s ease-in breath infinite;
-    }
+    
 
 
     .image-container {
@@ -154,7 +160,7 @@ export default {
     }
 
     25% {
-        transform: skew(20deg) translateY(0px) translateX(-40px) scale(2);
+        transform: skew(10deg) translateY(0px) translateX(0px) scale(2);
         -webkit-filter: drop-shadow(40px -1px 0px var(--type-color));
         filter: drop-shadow(40px -1px 0px var(--type-color));
     }
