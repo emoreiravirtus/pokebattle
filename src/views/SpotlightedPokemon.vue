@@ -67,6 +67,7 @@ export default {
     },
     mounted() {
         this.$store.dispatch('stopLoading');
+        
     },
     methods: {
         turnSpotlightOff() {
@@ -276,7 +277,7 @@ export default {
 @keyframes iddle {
   0% { transform: rotate(2deg); filter: drop-shadow(5px -5px 6px ) }
   25% { transform: rotate(-2deg) translateX(-1px) skew(2deg, 3deg); filter: drop-shadow(5px -5px 6px )  }
-  50% { transform: rotate(2deg); filter: drop-shadow(-57px -54px 100px var(--type-color))  }
+  50% { transform: rotate(2deg); filter: drop-shadow(-24px 0px 100px var(--type-color));  }
   75% { transform: rotate(-2deg) translateX(1px); filter: drop-shadow(5px -5px 6px )  }
   100% { transform: rotate(2deg); filter: drop-shadow(5px -5px 6px )  }
 }

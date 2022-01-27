@@ -23,7 +23,6 @@ export default {
   data() {
     return {
       allViewsContainersClass : [
-        '.spotlighted-pokemon-container',
         '.wiki-container',
         '.home-outer-container',
         '.secret-pokemon-outer-container'

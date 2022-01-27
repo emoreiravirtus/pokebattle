@@ -283,7 +283,7 @@ export default {
 
 @keyframes dance {
   0% { transform: rotate(10deg) }
-  25% { transform: rotate(-10deg) translateX(-46px) skew(6deg, 6deg) }
+  25% { transform: rotate(-10deg) translateX(-30px) skew(6deg, 6deg) }
   50% { transform: rotate(10deg) }
   75% { transform: rotate(-10deg) translateX(9px) }
   100% { transform: rotate(10deg) }
