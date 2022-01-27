@@ -1,45 +1,36 @@
 <template>
-  <div class="spotlighted-pokemon-container">
-        <div class="pokemon-wave" :style="{'background-image': gradientColor }"></div>
+  <div class="spotlighted-pokemon-container" :style="cssVars" v-if="pokemon">
+        <div class="pokemon-wave"></div>
         <div class="info-container">
-            <div class="average">
-                <p class="bold-font white-color special-font" :style="{'background-image': gradientColor }">
-                    Power: {{ pokemon.data.base_experience }}
-                </p>
-            </div>
             <div class="main-image">
-                <img :src="pokemon.data.sprites.other['official-artwork'].front_default">
+                <img :src="pokemon.sprites.other['official-artwork'].front_default">
             </div>
-                <p class="big-font special-font" :style="{'background-image': gradientColor }">{{ pokemon.data.name }}</p>
-            <ul class="normal-font white-color">
-                <li @click="changeSelectedTab('general')" 
-                    :style="{'background-image': gradientColor}">
-                    General
-                </li>
-                <li @click="changeSelectedTab('sprites')" 
-                     :style="{'background-image': gradientColor}">
-                    Sprites
+                <p class="big-font special-font centralize-text" :style="{'background-image': gradientColor }">{{ pokemon.name }}</p>
+            <ul class="normal-font white-color centralize-text">
+                <li v-for="(tab, index) of tabs" :key="index" @click="changeSelectedTab(tab)" 
+                    :class="{'active': tab == selectedTab, 'darker': tab != selectedTab}">
+                    {{ tab }}
                 </li>
             </ul>
             <div class="info-tab-container">
                 <div class="general-info-container" v-if="selectedTab == 'general'">
                     <div class="types-container">
                         <p class="normal-font white-color" 
-                            v-for="(type, index) in pokemon.data.types"
+                            v-for="(type, index) in pokemon.types"
                             :key="index" 
                             :style="{'background-image': getGradientColor(type.type.name)}">
                                 {{ type.type.name }}
                         </p>
                     </div>
                     <div class="skills-container">
-                        <div class="stat" v-for="(stat, index) in pokemon.data.stats" :key="index">
+                        <div class="stat" v-for="(stat, index) in pokemon.stats" :key="index">
                             <p class="normal-font special-font" :style="{'background-image': gradientColor }">{{ stat.stat.name }}</p>
                             <progress-bar :progress="stat.base_stat"></progress-bar>
                         </div>
                     </div>
                 </div>
                 <div class="sprites-container" v-if="selectedTab == 'sprites'">
-                    <div v-for="(sprite, index) in pokemon.data.sprites"
+                    <div v-for="(sprite, index) in pokemon.sprites"
                     :key="index">
                         <span v-if="typeof sprite === 'string'">
                             <img :src="sprite">
@@ -48,10 +39,6 @@
                 </div>
             </div>
         </div>
-
-        <button class="back-button" :style="{'background-image': gradientColor }" @click="turnSpotlightOff">
-            <img src="@/assets/back-icon.png" alt="Back icon">
-        </button>
   </div>
 </template>
 
@@ -66,26 +53,20 @@ export default {
     },
     data() {
         return {
+            pokemon: null,
             selectedTab: 'general',
+            tabs: [
+                'general',
+                'sprites',
+                'evolution'
+            ]
         }
     },
-    props: {
-        pokemon: {
-            type: Object,
-            default: () => {
-                return {
-                    spotlighted: false,
-                    data: {
-                        sprites: {
-                            '1': 'example'
-                        }
-                    }
-                }
-            }
-        }
+    async beforeCreate() {
+        this.pokemon = await this.$store.dispatch('getPokemon', this.$route.params.id);
     },
-    beforeCreate() {
-        document.querySelector('html').style.overflow = 'hidden';
+    mounted() {
+        this.$store.dispatch('stopLoading');
     },
     methods: {
         turnSpotlightOff() {
@@ -97,12 +78,18 @@ export default {
         },
         getGradientColor(type) {
             return 'linear-gradient(160deg, ' + colorsEnum[type] +' 0%, #480060 100%)';
-        }
+        },
     },
     computed: {
         gradientColor() {
-            let pokemonType = this.pokemon.data.types[0].type.name;
+            let pokemonType = this.pokemon.types[0].type.name;
             return 'linear-gradient(160deg, ' + colorsEnum[pokemonType] +' 0%, #480060 100%)';
+        },
+        cssVars() {
+            let pokemonType = this.pokemon.types[0].type.name;
+            return {
+                '--type-color': colorsEnum[pokemonType]
+            }
         }
     }
 }
@@ -120,13 +107,13 @@ export default {
     z-index: 3;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
 
     .pokemon-wave{
         position: absolute;
         width: 100%;
         height: 331px;
-        background: #03a9f4;
+        background-color: var(--type-color);
+        background-image: url("../assets/diagmonds.png"), linear-gradient(160deg, var(--type-color) 0%, rgb(72, 0, 96) 100%);
         top: 0;
         z-index: -1;
         clip-path: ellipse(100% 55% at 48% 44%);
@@ -136,20 +123,9 @@ export default {
         text-align: center;
 
         img {
-            width: 350px;
-            filter: drop-shadow(5px -5px 6px );
-            animation: 1s linear pump forwards;
+            width: 400px;
+            animation: 6s linear iddle infinite;
         }
-    }
-
-    .average {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: #fff;
-        padding: 0 30px;
-        border-radius: 21px;
-        box-shadow: rgb(100 100 111 / 20%) 0px 7px 29px 0px;
     }
 
     .info-container {
@@ -158,7 +134,7 @@ export default {
         align-content: center;
 
         .big-font {
-            padding: 0 10px;
+            margin: 10px 0;
             text-transform: capitalize;
         }
     }
@@ -167,18 +143,57 @@ export default {
         list-style: none;
         padding: 0 0px 5px 10px;
         margin: 0;
-        border-bottom: 1px solid rgb(150, 150, 150);
         
+        .active {
+            z-index: 3;
+        }
+
         li {
+            transition: all .4s;
             display: inline;
-            margin: 0 10px 0 0;
             cursor: pointer;
-            padding: 5px 20px;
-            border-radius: 32px 32px 0 0;
+            padding: 5px 12px;
+            border-radius: 18px 18px 0 0;
+            position: relative;
+            background-color: var(--type-color);
+            margin: 0 16px;
+            z-index: 2;
+
+            &:before,
+            &:after {
+            content: " ";
+                position: absolute;
+                top: 0;
+                width: 23px;
+                height: 100%;
+                background-color: inherit;
+                transform: translate3d(1px);
+                z-index: -1;
+            }
+
+            &:before {
+                border-radius: 12px 0 0 0;
+                transform: skew(-24deg);
+                left: -13px;
+            }
+
+            &:after {
+                border-radius: 0 12px 0 0;
+                transform: skew(24deg);
+                right: -13px;
+                border-right: 1px solid inherit;
+                z-index: 1;
+            }
         }
     }
 
     .info-tab-container {
+        display: flex;
+        justify-content: center;
+        border-radius: 50px 50px 0 0;
+        border-top: 4px solid #dbdbdb;
+        height: 170px;
+        background: white;
 
         .sprites-container {
             padding: 0 10px;
@@ -256,5 +271,13 @@ export default {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+@keyframes iddle {
+  0% { transform: rotate(2deg); filter: drop-shadow(5px -5px 6px ) }
+  25% { transform: rotate(-2deg) translateX(-1px) skew(2deg, 3deg); filter: drop-shadow(5px -5px 6px )  }
+  50% { transform: rotate(2deg); filter: drop-shadow(-57px -54px 100px var(--type-color))  }
+  75% { transform: rotate(-2deg) translateX(1px); filter: drop-shadow(5px -5px 6px )  }
+  100% { transform: rotate(2deg); filter: drop-shadow(5px -5px 6px )  }
 }
 </style>

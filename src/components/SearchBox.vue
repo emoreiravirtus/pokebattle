@@ -48,9 +48,6 @@ export default {
       let pokemonName = autocomplete ? pokemonName = this.suggestions[0] : this.searchTerm;
 
       await this.$store.dispatch("searchSpecificPokemon", pokemonName.toLowerCase())
-      this.searchTerm = null;
-      this.suggestions = null;
-      this.notFound = false;
     },
     filterResults() {
       let result = this.allPokemonNames.filter((item) => {
@@ -157,7 +154,7 @@ export default {
       top: calc(21px - 15px);
       right: 10px;
       position: absolute;
-      background-color: #2196f3;
+      background-color: #dbdbdb;
       border: none;
       width: 30px;
       height: 30px;
@@ -171,14 +168,15 @@ export default {
     margin: -10px;
     padding: 29px 0 0 0;
     width: 100%;
+    list-style: none;
 
     li {
-      padding: 0 46px;
+      padding: 14px 23px;
     }
 
     li:nth-child(odd) {
       cursor: pointer;
-      background-color: #fafafa;
+      background-color: #c1c1c1;
       color: rgb(63, 57, 57);
       list-style: none;
     }

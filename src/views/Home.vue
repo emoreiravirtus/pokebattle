@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import menuWhoImage from '@/assets/menu-who.jpg';
-import menuWikiImage from '@/assets/menu-wiki.jpg';
+import menuMiniGamesImage from '@/assets/menu-games.jpg';
+import menuWikiImage from '@/assets/menu-wiki.png';
 import menuBattleImage from '@/assets/menu-battle.jpg';
 import GeneralSquareCard from '@/components/GeneralSquareCard.vue';
 
@@ -29,9 +29,9 @@ export default {
           enabled: true
         },
         {
-          name: 'Quizz',
-          image: menuWhoImage,
-          route: '/secret-pokemon',
+          name: 'Mini Games',
+          image: menuMiniGamesImage,
+          route: '/mini-games',
           enabled: true
         },
         {
@@ -42,7 +42,7 @@ export default {
         }
       ]
     }
-  },
+  }
 }
 </script>
 

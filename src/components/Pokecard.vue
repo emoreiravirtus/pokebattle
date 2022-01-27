@@ -1,5 +1,5 @@
 <template>
-    <div class="pokecard" :style="[{ 'background-image': gradientColor }, cssVars]" @click="spotlightPokemon">
+    <div class="pokecard" :style="[cssVars]" @click="spotlightPokemon">
         <div class="image-container">
             <img :src="pokemon.sprites.front_default" :alt="pokemon.name + 'image'">
         </div>
@@ -7,7 +7,7 @@
             <p class="bold-font white-color">{{ pokemon.name }}</p>
             <div class="main-info-container">
                 <div class="types-container">
-                    <p class="normal-font white-color" 
+                    <p class="normal-font white-color"
                         v-for="(type, index) in pokemon.types"
                         :key="index">
                             {{ type.type.name }}
@@ -49,11 +49,12 @@ export default {
     },
     methods: {
         spotlightPokemon() {
-            document.querySelectorAll('.pokecard img')[this.indexNumber].style = 'animation: 4s ease-in breath infinite';
+            this.$store.dispatch('startLoading');
+            document.querySelectorAll('.pokecard img')[this.indexNumber].style = 'animation: 2s ease-in breath infinite';
             setTimeout(() => {
-                this.$store.dispatch('spotlightPokemon', this.pokemon);
+                this.$router.push({name: 'SpotlightedPokemon', params: { id: this.pokemon.id} })
                 document.querySelectorAll('.pokecard img')[this.indexNumber].style = 'animation: unset';
-            }, 2000);
+            }, 1000);
         }
     },
     computed: {
@@ -81,6 +82,8 @@ export default {
     cursor: pointer;
     transition: transform .4s;
     z-index: 0;
+
+    background-image: url("../assets/diagmonds.png"), linear-gradient(160deg, var(--type-color) 0%, rgb(72, 0, 96) 100%);
 
     &:hover {
         transform: scale(1.1);
@@ -154,31 +157,31 @@ export default {
     }
 
     15% {
-        transform: translateY(0px) scale(2);
+        transform: translateY(0px) scale(1.4);
         -webkit-filter: drop-shadow(18px -1px 0px var(--type-color));
         filter: drop-shadow(18px -1px 0px var(--type-color));
     }
 
     25% {
-        transform: skew(10deg) translateY(0px) translateX(0px) scale(2);
+        transform: skew(10deg) translateY(0px) translateX(0px) scale(1.4);
         -webkit-filter: drop-shadow(40px -1px 0px var(--type-color));
         filter: drop-shadow(40px -1px 0px var(--type-color));
     }
 
     40% {
-        transform: skew(0deg) translateY(0px) scale(2);
+        transform: skew(0deg) translateY(0px) scale(1.4);
         -webkit-filter: drop-shadow(8px -1px 0px #fff);
         filter: drop-shadow(8px -1px 0px #fff);
     }
 
     50% {
-        transform: skew(4deg) translateY(0px) scale(2);
+        transform: skew(4deg) translateY(0px) scale(1.4);
         -webkit-filter: drop-shadow(8px -1px 0px var(--type-color));
         filter: drop-shadow(8px -1px 0px var(--type-color));
     }
 
     75% {
-        transform: translateY(-20px) scale(2);
+        transform: translateY(-20px) scale(1.4);
     }
 
     100% {

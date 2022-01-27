@@ -1,13 +1,9 @@
 <template>
-  <spotlighted-pokemon
-    v-if="SpotlightedPokemon.spotlighted"
-    :pokemon="SpotlightedPokemon"
-  ></spotlighted-pokemon>
-  <div class="wiki-container">
+  <div class="wiki-container" v-if="pokemons">
     <search-box class="search-position"></search-box>
     <div class="pokemons-container">
       <pokecard
-        v-for="(pokemon, index) in Pokemons"
+        v-for="(pokemon, index) in pokemons"
         :key="index"
         :pokemon="pokemon"
         :indexNumber="index"
@@ -19,36 +15,31 @@
       </button>
     </div>
   </div>
-  <audio autoplay loop>
-    <source src="@/assets/wiki-music.mp3" type="audio/mp3">
-  </audio>
 </template>
 
 <script>
 import Pokecard from "@/components/Pokecard.vue";
 import SearchBox from "@/components/SearchBox.vue";
-import SpotlightedPokemon from "@/components/SpotlightedPokemon.vue";
 
 export default {
   name: "Wiki",
   components: {
     Pokecard,
     SearchBox,
-    SpotlightedPokemon,
   },
-  beforeCreate() {
-    this.$store.dispatch("populatePokemons");
+  data() {
+    return {
+      pokemons: []
+    }
+  },
+  mounted() {
+    this.$store.dispatch("populatePokemons")
+      .then(() => {
+        this.pokemons = this.$store.getters["allPokemons"];
+    });
   },
   beforeUnmount() {
     this.$store.dispatch("cleanPokemons");
-  },
-  computed: {
-    Pokemons() {
-      return this.$store.getters["allPokemons"];
-    },
-    SpotlightedPokemon() {
-      return this.$store.getters["spotlightedPokemon"];
-    },
   },
   methods: {
     loadMorePokemons() {

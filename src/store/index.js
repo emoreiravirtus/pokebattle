@@ -6,20 +6,23 @@ let offset = 10;
 export default createStore({
   state: {
     pokemons: [],
-    spotlightedPokemon: { spotlighted: false, data: '' }
+    isLoading: false,
+    muted: false
   },
   mutations: {
     addPokemonToList: (state, pokemon) => state.pokemons.push( pokemon ),
-    spotlightPokemon: (state, data) => state.spotlightedPokemon = { spotlighted: true, data },
-    turnSpotlightOff: state => state.spotlightedPokemon = { spotlighted: false, data: '' },
-    cleanPokemons: state => state.pokemons = []
+    cleanPokemons: state => state.pokemons = [],
+    startLoading: state => state.isLoading = true,
+    stopLoading: state => state.isLoading = false,
+    toggleMuted: state => state.muted = !state.muted
   },
   getters: {
     allPokemons: state => state.pokemons,
-    spotlightedPokemon: state => state.spotlightedPokemon
+    isLoading: state => state.isLoading,
+    muted: state => state.muted
   },
   actions: {
-    populatePokemons( context, isInitial = true ) {
+    async populatePokemons( context, isInitial = true ) {
 
       let searchUrl;
 
@@ -31,9 +34,7 @@ export default createStore({
         offset += 10;
       }
 
-      console.log(searchUrl);
-
-      fetch(searchUrl)
+      return await fetch(searchUrl)
         .then( async response => {
           const data = await response.json();
 
@@ -63,22 +64,25 @@ export default createStore({
     cleanPokemons( context ) {
       context.commit('cleanPokemons');
     },
-    searchSpecificPokemon( context, pokemonName ) {
-      fetch(`${url}/pokemon/${pokemonName}`)
+    async getPokemon(_, id ) {
+      let pokemon;
+      await fetch(`${url}/pokemon/${id}`)
         .then( async response => {
-          const data = await response.json();
-          context.commit('spotlightPokemon', data);
-          return response;
+          pokemon = await response.json();
         })
         .catch(error => {
           return error;
         })
+      return pokemon;
     },
-    spotlightPokemon( context, data ) {
-      context.commit('spotlightPokemon', data);
+    startLoading( context ) {
+      context.commit('startLoading');
     },
-    turnSpotlightOff( context ) {
-      context.commit('turnSpotlightOff');
+    stopLoading( context ) {
+      context.commit('stopLoading');
+    },
+    toggleMuted( context ) {
+      context.commit('toggleMuted');
     }
   },
   modules: {

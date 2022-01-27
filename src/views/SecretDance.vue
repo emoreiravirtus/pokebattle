@@ -14,7 +14,7 @@
               You scored {{ points }} points!
             </p>
           </div>
-          <img v-else :class="{'hidden': hidden}" :src="pokemonList[currentIndex].sprites.other['official-artwork'].front_default">
+          <img v-else :class="{'hidden': hidden, 'dance': !muted}" :src="pokemonList[currentIndex].sprites.other['official-artwork'].front_default">
       </div>
       <div class="options-container">
         <button class="bold-font option-button"  v-for="(option, index) of options" :key="index" @click="giveAnswer(option)">
@@ -27,9 +27,6 @@
       <p class="bold-font white-color">Current Record: {{ record }}</p>
       <button class="bold-font" @click="startGame">Start Game</button>
     </div>
-    <audio autoplay loop>
-      <source src="@/assets/who-music.mp3" type="audio/mp3">
-    </audio>
   </div>
 </template>
 
@@ -38,7 +35,7 @@ import colorsEnum from '@/utils/colors.js'
 import pokemon from "pokemon";
       
 export default {
-    name: 'SecretPokemon',
+    name: 'SecretDance',
     data() {
       return {
         pokemonList: [],
@@ -55,6 +52,10 @@ export default {
       }
     },
     async beforeCreate() {
+      this.$store.dispatch('startLoading');
+      setTimeout(() => {
+        this.$store.dispatch('stopLoading');
+      }, 1500);
       this.pokemonList = await this.$store.dispatch('getNRandomPokemons', 2);
       this.record = localStorage.getItem('record');
     },
@@ -127,6 +128,9 @@ export default {
         }
         else {
           this.gameStarted = false;
+          this.pokemonList = [];
+          this.addMorePokemons();
+          this.addOptions();
           if(this.record < this.points) {
             localStorage.setItem('record', this.points);
             this.record = this.points;
@@ -143,6 +147,9 @@ export default {
           return {
               '--type-color': colorsEnum[pokemonType]
           }
+      },
+      muted() {
+        return this.$store.getters['muted'];
       }
     }
 }
@@ -203,6 +210,8 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    height: 100vh;
 
     .main-image {
       text-align: center;
@@ -217,7 +226,6 @@ export default {
       img {
           width: 350px;
           filter: drop-shadow(5px -5px 6px);
-          animation: 1s linear pump forwards;
       }
 
       .hidden {
@@ -257,9 +265,13 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #2196f3;
-    background-image: url("../assets/texture.png");
+    background-color: #dbdbdb;
+    background-image: url("../assets/diagmonds.png");
   }
+}
+
+.dance {
+  animation: 1.62s dance infinite;
 }
 
 @keyframes disapear {
@@ -267,5 +279,13 @@ export default {
   50% { transform: translateY(-40px) }
   99% { opacity: 1; transform: translateY(-40px) }
   100% { opacity: 0; transform: translateY(-40px) }
+}
+
+@keyframes dance {
+  0% { transform: rotate(10deg) }
+  25% { transform: rotate(-10deg) translateX(-46px) skew(6deg, 6deg) }
+  50% { transform: rotate(10deg) }
+  75% { transform: rotate(-10deg) translateX(9px) }
+  100% { transform: rotate(10deg) }
 }
 </style>

@@ -55,7 +55,7 @@ a {
     height: 31px;
     left: 15px;
     cursor: pointer;
-    background: #2196f3;
+    background: #dbdbdb;
     padding-right: 8px;
     z-index: 5;
 
@@ -77,4 +77,42 @@ a {
 .primary-background{
     background-color: $primary-color;
     color: #fff;
+}
+
+.centralize-text {
+    text-align: center;
+}
+
+.darker {
+    filter: brightness(60%);
+}
+
+@keyframes slide-left-disappear {
+    0% { transform: translateX(0) }
+    99% { transform: translateX(100vw) }
+    100% { transform: translateX(100vw); opacity: 0; }
+}
+
+@keyframes rotating {
+    0% { transform: rotate(0) scale(1) }
+    50% { transform: rotate(180deg) scale(1.4) }
+    100% { transform: rotate(360deg) scale(1) }
+}
+  
+@keyframes slide-right-appear {
+    0% { transform: translateX(-100vw); opacity: 0; }
+    99% { transform: translateX(0vw); opacity: 1; }
+    100% { transform: translateX(0vw); opacity: 1 }
+}
+
+@keyframes slide-right-disappear {
+    0% { transform: translateX(-100vw); opacity: 1; }
+    99% { transform: translateX(0vw); opacity: 0; }
+    100% { transform: translateX(0vw); opacity: 0 }
+}
+
+@keyframes slide-left-appear {
+    0% { transform: translateX(0); opacity: 0; }
+    99% { transform: translateX(100vw); opacity: 1; }
+    100% { transform: translateX(100vw); opacity: 1; }
 }

@@ -41,7 +41,8 @@ export default {
     border-radius: 10px;
     width: 163px;
     height: 179px;
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
     position: relative;
     overflow: hidden;
     background-position: center;

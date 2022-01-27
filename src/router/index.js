@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Wiki from '../views/Wiki.vue'
-import SecretPokemon from '../views/SecretPokemon.vue'
+import SecretDance from '../views/SecretDance.vue'
+import SpotlightedPokemon from '../views/SpotlightedPokemon'
+import MiniGames from '../views/MiniGames'
 
 const routes = [
   {
@@ -15,10 +17,20 @@ const routes = [
     component: Wiki
   },
   {
-    path: '/secret-pokemon',
-    name: 'SecretPokemon',
-    component: SecretPokemon
-  }
+    path: '/secret-dance',
+    name: 'SecretDance',
+    component: SecretDance
+  },
+  {
+    path: '/spotlighted-pokemon/:id',
+    name: 'SpotlightedPokemon',
+    component: SpotlightedPokemon
+  },
+  {
+    path: '/mini-games',
+    name: 'MiniGames',
+    component: MiniGames
+  },
 ]
 
 const router = createRouter({
