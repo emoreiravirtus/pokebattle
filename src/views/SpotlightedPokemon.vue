@@ -3,7 +3,8 @@
         <div class="pokemon-wave"></div>
         <div class="info-container">
             <div class="main-image">
-                <img :src="pokemon.sprites.other['official-artwork'].front_default">
+                <img :src="pokemon.sprites.other['official-artwork'].front_default" @click="cry()">
+                <div id="chat-box" v-if="cried"><p class="big-font">{{ pokemon.name }}!</p></div>
             </div>
                 <p class="big-font special-font centralize-text" :style="{'background-image': gradientColor }">{{ pokemon.name }}</p>
             <ul class="normal-font white-color centralize-text">
@@ -39,6 +40,9 @@
                 </div>
             </div>
         </div>
+        <audio id="PokemonCry">
+            <source src="src/assets/pikachu.mp3" type="audio/mp3">
+        </audio>
   </div>
 </template>
 
@@ -54,6 +58,7 @@ export default {
     data() {
         return {
             pokemon: null,
+            cried: false,
             selectedTab: 'general',
             tabs: [
                 'general',
@@ -67,9 +72,16 @@ export default {
     },
     mounted() {
         this.$store.dispatch('stopLoading');
-        
     },
     methods: {
+        cry() {
+            this.cried = true;
+            setTimeout(() => {
+                this.cried = false;
+            }, 2000);
+            let player = new Audio(this.pokemonCry);
+            player.play();
+        },
         turnSpotlightOff() {
             document.querySelector('html').style.overflow = 'unset';
             this.$store.dispatch('turnSpotlightOff');
@@ -82,6 +94,9 @@ export default {
         },
     },
     computed: {
+        pokemonCry() {
+            return '../assets/' + this.pokemon.name + '.mp3';
+        },
         gradientColor() {
             let pokemonType = this.pokemon.types[0].type.name;
             return 'linear-gradient(160deg, ' + colorsEnum[pokemonType] +' 0%, #480060 100%)';
@@ -108,6 +123,7 @@ export default {
     z-index: 3;
     display: flex;
     flex-direction: column;
+    justify-content: space-around;
 
     .pokemon-wave{
         position: absolute;
@@ -122,6 +138,18 @@ export default {
 
     .main-image {
         text-align: center;
+        position: relative;
+
+        #chat-box {
+            position: absolute;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid;
+            border-radius: 53px;
+            top: 15px;
+            left: 20vw;
+            animation: 2s linear chat infinite;
+        }
 
         img {
             width: 400px;
@@ -276,9 +304,18 @@ export default {
 
 @keyframes iddle {
   0% { transform: rotate(2deg); filter: drop-shadow(5px -5px 6px ) }
-  25% { transform: rotate(-2deg) translateX(-1px) skew(2deg, 3deg); filter: drop-shadow(5px -5px 6px )  }
-  50% { transform: rotate(2deg); filter: drop-shadow(-24px 0px 100px var(--type-color));  }
+  25% { transform: rotate(-2deg) translateX(-1px); filter: drop-shadow(5px -5px 6px )  }
+  30% { transform: rotate(-4deg); filter: drop-shadow(0 0 10px var(--type-color));  }
+  60% { transform: rotate(-9deg) translateY(-20px); filter: drop-shadow(0 0 10px var(--type-color)) brightness(120%);  }
   75% { transform: rotate(-2deg) translateX(1px); filter: drop-shadow(5px -5px 6px )  }
   100% { transform: rotate(2deg); filter: drop-shadow(5px -5px 6px )  }
+}
+@keyframes chat {
+  0% { transform: rotate(-2deg); filter: drop-shadow(5px -5px 6px ); opacity: 0  }
+  25% { transform: rotate(2deg) translateX(1px); filter: drop-shadow(5px -5px 6px ); opacity: 1  }
+  30% { transform: rotate(9deg) translateY(3px); filter: drop-shadow(0 0 60px); opacity: 1  }
+  60% { transform: rotate(4deg); filter: drop-shadow(0 0 10px); opacity: 1  }
+  75% { transform: rotate(2deg) translateX(-1px); filter: drop-shadow(5px -5px 6px ); opacity: 1  }
+  100% { transform: rotate(-2deg); filter: drop-shadow(5px -5px 6px ); opacity: 0 }
 }
 </style>

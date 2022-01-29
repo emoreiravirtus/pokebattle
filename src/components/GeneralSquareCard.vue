@@ -41,12 +41,12 @@ export default {
     border-radius: 10px;
     width: 163px;
     height: 179px;
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     position: relative;
     overflow: hidden;
     background-position: center;
-    transition: transform .3s;
+    transition: transform 0.3s;
 
     &:hover {
         transform: scale(1.2);

@@ -14,7 +14,7 @@
               You scored {{ points }} points!
             </p>
           </div>
-          <img v-else :class="{'hidden': hidden, 'dance': !muted}" :src="pokemonList[currentIndex].sprites.other['official-artwork'].front_default">
+          <img v-else :class="{'hidden': hidden, 'dance': !muted}" :src="secretPokemon.sprites.other['official-artwork'].front_default">
       </div>
       <div class="options-container">
         <button class="bold-font option-button"  v-for="(option, index) of options" :key="index" @click="giveAnswer(option)">
@@ -24,59 +24,88 @@
       <button class="bold-font primary-background max-width" v-if="!hidden" @click="continueGame">Continue</button>
     </div>
     <div class="modal" v-else>
-      <p class="bold-font white-color">Current Record: {{ record }}</p>
-      <button class="bold-font" @click="startGame">Start Game</button>
+      <p class="bold-font white-color">World Records</p>
+      <table :key="componentKey">
+        <tr class="bold-font">
+          <th>Master Name</th>
+          <th>Points</th>
+        </tr>
+        <tr v-for="(record, index) of sortRecords(records)" :key="index">
+          <td class="bold-font">{{ record.userName }}</td>
+          <td class="bold-font">{{ record.record }}</td>
+        </tr>
+      </table>
+      <button class="bold-font success-background" @click="startGame">Start Game</button>
     </div>
+    <audio v-if="!muted && gameStarted" autoplay loop>
+        <source src="@/assets/who-music.mp3" type="audio/mp3">
+    </audio>
   </div>
 </template>
 
 <script>
-import colorsEnum from '@/utils/colors.js'
-import pokemon from "pokemon";
-      
+
 export default {
     name: 'SecretDance',
     data() {
       return {
-        pokemonList: [],
+        componentKey: 0,
+        secretPokemon: {},
         gameStarted: false,
-        currentIndex: 0,
         hidden: true,
         options: [],
-        allPokemonNames: pokemon.all(),
         points: 0,
         lastPoints: 0,
-        hearts: 5,
+        hearts: 3,
         multiplier: 1,
         record: 0
       }
     },
     async beforeCreate() {
-      this.$store.dispatch('startLoading');
-      setTimeout(() => {
-        this.$store.dispatch('stopLoading');
-      }, 1500);
-      this.pokemonList = await this.$store.dispatch('getNRandomPokemons', 2);
+      await this.$store.dispatch('bindSecretDanceRecords');
       this.record = localStorage.getItem('record');
     },
+    mounted() {
+        let isMuted = localStorage.getItem('muted');
+        if (isMuted == 'true') {
+            this.$store.dispatch('stopAudio');
+        }
+        else {
+            this.$store.dispatch('playAudio')
+        }
+        setInterval(() => {
+          this.forceRerender();
+        }, 3000);
+    },
     methods: {
+      sortRecords(records) {
+        return records.sort((a, b) => {
+          console.log(a.record < b.record)
+          if(a.record > b.record) {
+            return -1;
+          }
+          if(a.record < b.record){
+            return 1;
+          } 
+          return 0;
+        })
+      },
+      forceRerender() {
+        this.componentKey += 1;
+      },
       async startGame() {
         this.gameStarted = true;
-        this.currentIndex = 0;
-        this.hearts = 5;
+        this.hearts = 4;
         this.addMorePokemons();
         this.addOptions();
       },
       async addMorePokemons() {
-        let newPokemons = await this.$store.dispatch('getNRandomPokemons', 1);
-        this.pokemonList.push(newPokemons[0]);
+        let random = Math.floor(Math.random() * (1000 -  + 1)) + 0;
+        this.secretPokemon = this.$store.getters['allPokemons'].slice(random, random + 1)[0];
       },
       addOptions() {
         let randomNumbers = Array.from({length: 3}, () => Math.floor(Math.random() * 898));
-        let currentPokemonName = this.pokemonList[this.currentIndex].name;
-
-        currentPokemonName = currentPokemonName.charAt(0).toUpperCase() + currentPokemonName.slice(1);
-
+        let currentPokemonName = this.secretPokemon.name;
         randomNumbers.push(this.allPokemonNames.indexOf(currentPokemonName));
 
         randomNumbers.sort(() => Math.random() - 0.5);
@@ -91,10 +120,10 @@ export default {
         }
       },
       giveAnswer(option) {
-        this.hidden = false;
+        if (!this.hidden) return;
 
         for(let index in this.options) {
-          if(this.options[index].toLowerCase() == this.pokemonList[this.currentIndex].name) {
+          if(this.options[index] == this.secretPokemon.name) {
             document.querySelectorAll('.option-button')[index].classList.add('success-background');
           }
           else {
@@ -102,10 +131,10 @@ export default {
           }
         }
 
-        if(option.toLowerCase() == this.pokemonList[this.currentIndex].name) {
-          this.points += 300 * this.multiplier;
+        if(option == this.secretPokemon.name) {
+          this.points += 375 * this.multiplier;
 
-          if(this.multiplier >= 2) {
+          if(this.multiplier >= 3) {
             this.hearts++;
           }
 
@@ -115,6 +144,8 @@ export default {
           this.hearts--;
           this.multiplier = 1;
         }
+
+        this.hidden = false;
       },
       continueGame() {
         this.lastPoints = this.points;
@@ -123,33 +154,34 @@ export default {
 
         if(this.hearts != 0){
           this.addMorePokemons();
-          this.currentIndex++;
           this.addOptions();
         }
         else {
           this.gameStarted = false;
-          this.pokemonList = [];
-          this.addMorePokemons();
-          this.addOptions();
-          if(this.record < this.points) {
-            localStorage.setItem('record', this.points);
-            this.record = this.points;
-          }
+          this.saveRecord();
         }
       },
       hasDuplicates(array) {
         return (new Set(array)).size !== array.length;
+      },
+      saveRecord() {
+        let random = Math.floor(Math.random() * (10000 -  + 1)) + 0;
+        let data = {
+          userName: localStorage.getItem('userName') ? localStorage.getItem('userName') : `Pokemon Master${ random }`,
+          record: this.points
+        }
+        this.$store.dispatch('saveSecretDanceRecords', data)
       }
     },
     computed: {
-      cssVars() {
-          let pokemonType = this.pokemonList[this.currentIndex].types[0].type.name;
-          return {
-              '--type-color': colorsEnum[pokemonType]
-          }
-      },
       muted() {
         return this.$store.getters['muted'];
+      },
+      allPokemonNames() {
+        return this.$store.getters['pokemonNames']
+      },
+      records() {
+        return this.$store.getters['secretDanceRecords'];
       }
     }
 }
@@ -181,6 +213,22 @@ export default {
       }
     }
     
+  }
+
+  table {
+    background: #fff;
+    width: 70vw;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: rgb(100 100 111 / 20%) 0px 7px 29px 0px;
+
+    th {
+      text-align: left;
+      padding: 10px;
+    }
+    td {
+      padding: 10px;
+    }
   }
 
   .plus-points {
@@ -264,14 +312,19 @@ export default {
     overflow: hidden;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background-color: #dbdbdb;
+    justify-content: space-around;
+    background-color: #2196f3;
     background-image: url("../assets/diagmonds.png");
   }
 }
 
+.preparing {
+  animation: 3.2s dance;
+}
+
 .dance {
   animation: 1.62s dance infinite;
+  animation-delay: 3.2s;
 }
 
 @keyframes disapear {

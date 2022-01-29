@@ -3,14 +3,10 @@
         <div class="sound-off" v-if="muted"></div>
         <img src="@/assets/sound-on.png">
     </div>
-    <audio v-if="(currentRouteName == 'Home' || currentRouteName == 'MiniGames') && !muted" autoplay loop>
+    <audio 
+        v-if="(['Wiki', 'Home', 'SpotlightedPokemon', 'MiniGames'].includes(currentRouteName)) 
+            && !muted" autoplay loop>
         <source src="@/assets/home-music.mp3" type="audio/mp3">
-    </audio>
-    <audio v-if="currentRouteName == 'SecretDance' && !muted" autoplay loop>
-        <source src="@/assets/who-music.mp3" type="audio/mp3">
-    </audio>
-    <audio v-if="(currentRouteName == 'Wiki' || currentRouteName == 'SpotlightedPokemon') && !muted" autoplay loop>
-        <source src="@/assets/wiki-music.mp3" type="audio/mp3">
     </audio>
 </template>
 
@@ -19,7 +15,16 @@ export default {
     name: 'SoundPlayer',
     methods: {
         toggleMuted() {
-            this.$store.dispatch('toggleMuted');
+            this.muted ? this.$store.dispatch('playAudio') : this.$store.dispatch('stopAudio');
+        }
+    },
+    mounted() {
+        let isMuted = localStorage.getItem('muted');
+        if (isMuted == 'true') {
+            this.$store.dispatch('stopAudio');
+        }
+        else {
+            this.$store.dispatch('playAudio')
         }
     },
     computed: {
@@ -40,6 +45,11 @@ export default {
     right: 10px;
     cursor: pointer;
     z-index: 5;
+    padding: 10px;
+    box-shadow: rgb(0 0 0 / 79%) 0px 7px 17px 0px;
+    background: #fff;
+    border-radius: 50%;
+
 
     img {
         height: 30px;
@@ -51,9 +61,10 @@ export default {
         height: 39px;
         background: #92959c;
         position: absolute;
-        transform: rotate(312deg);
-        right: 13px;
-        bottom: -2px;
+        transform: rotate(131deg);
+        right: 22px;
+        bottom: 7px;
+        border-radius: 30px;
     }
 }
 </style>
