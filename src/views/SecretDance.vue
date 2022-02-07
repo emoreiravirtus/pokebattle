@@ -24,18 +24,19 @@
       <button class="bold-font primary-background max-width" v-if="!hidden" @click="continueGame">Continue</button>
     </div>
     <div class="modal" v-else>
+      <button class="bold-font success-background" @click="startGame">Start Game</button>
       <p class="bold-font white-color">World Records</p>
-      <table :key="componentKey">
-        <tr class="bold-font">
+      <table>
+        <tr class="bold-font" v-if="records.length">
           <th>Master Name</th>
           <th>Points</th>
         </tr>
+        <th class="bold-font" v-else>Loading Records...</th>
         <tr v-for="(record, index) of sortRecords(records)" :key="index">
           <td class="bold-font">{{ record.userName }}</td>
           <td class="bold-font">{{ record.record }}</td>
         </tr>
       </table>
-      <button class="bold-font success-background" @click="startGame">Start Game</button>
     </div>
     <audio v-if="!muted && gameStarted" autoplay loop>
         <source src="@/assets/who-music.mp3" type="audio/mp3">
@@ -49,7 +50,6 @@ export default {
     name: 'SecretDance',
     data() {
       return {
-        componentKey: 0,
         secretPokemon: {},
         gameStarted: false,
         hidden: true,
@@ -62,8 +62,12 @@ export default {
       }
     },
     async beforeCreate() {
-      await this.$store.dispatch('bindSecretDanceRecords');
+      await this.$store.dispatch('subscribeDanceRecords');
+      await this.$store.dispatch('populatePokemonNames');
       this.record = localStorage.getItem('record');
+    },
+    async beforeUnmount() {
+      await this.$store.dispatch('unsubscribeDanceRecords');
     },
     mounted() {
         let isMuted = localStorage.getItem('muted');
@@ -73,14 +77,10 @@ export default {
         else {
             this.$store.dispatch('playAudio')
         }
-        setInterval(() => {
-          this.forceRerender();
-        }, 3000);
     },
     methods: {
       sortRecords(records) {
         return records.sort((a, b) => {
-          console.log(a.record < b.record)
           if(a.record > b.record) {
             return -1;
           }
@@ -90,22 +90,20 @@ export default {
           return 0;
         })
       },
-      forceRerender() {
-        this.componentKey += 1;
-      },
       async startGame() {
         this.gameStarted = true;
-        this.hearts = 4;
-        this.addMorePokemons();
+        this.hearts = 3;
+        this.addProperties();
+      },
+      async addProperties() {
+        let random = Math.floor(Math.random() * (1117 - 1) + 1);
+        this.secretPokemon = await this.$store.dispatch('getPokemon', random)
         this.addOptions();
       },
-      async addMorePokemons() {
-        let random = Math.floor(Math.random() * (1000 -  + 1)) + 0;
-        this.secretPokemon = this.$store.getters['allPokemons'].slice(random, random + 1)[0];
-      },
       addOptions() {
-        let randomNumbers = Array.from({length: 3}, () => Math.floor(Math.random() * 898));
+        let randomNumbers = Array.from({length: 3}, () => Math.floor(Math.random() * 1117));
         let currentPokemonName = this.secretPokemon.name;
+        
         randomNumbers.push(this.allPokemonNames.indexOf(currentPokemonName));
 
         randomNumbers.sort(() => Math.random() - 0.5);
@@ -153,8 +151,7 @@ export default {
         this.hidden = true;
 
         if(this.hearts != 0){
-          this.addMorePokemons();
-          this.addOptions();
+          this.addProperties();
         }
         else {
           this.gameStarted = false;
@@ -165,7 +162,7 @@ export default {
         return (new Set(array)).size !== array.length;
       },
       saveRecord() {
-        let random = Math.floor(Math.random() * (10000 -  + 1)) + 0;
+        let random = Math.floor(Math.random() * (10000 - 1) + 0);
         let data = {
           userName: localStorage.getItem('userName') ? localStorage.getItem('userName') : `Pokemon Master${ random }`,
           record: this.points
@@ -178,7 +175,7 @@ export default {
         return this.$store.getters['muted'];
       },
       allPokemonNames() {
-        return this.$store.getters['pokemonNames']
+        return this.$store.getters['pokemonNames'];
       },
       records() {
         return this.$store.getters['secretDanceRecords'];
@@ -315,6 +312,18 @@ export default {
     justify-content: space-around;
     background-color: #2196f3;
     background-image: url("../assets/diagmonds.png");
+
+    table {
+      height: 100px;
+      overflow: auto;
+
+      #loading {
+        border-radius: 50%;
+        height: 30px;
+        width: 30px;
+        border: 2px solid;
+      }
+    }
   }
 }
 

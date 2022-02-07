@@ -68,10 +68,9 @@ export default {
         }
     },
     async beforeCreate() {
-        this.pokemon = await this.$store.dispatch('getPokemon', this.$route.params.id);
-    },
-    mounted() {
-        this.$store.dispatch('stopLoading');
+        this.$store.dispatch('startLoading');
+        this.pokemon = await this.$store.dispatch('getPokemon', this.$route.params.id)
+            .then(this.$store.dispatch('stopLoading'));
     },
     methods: {
         cry() {

@@ -1,8 +1,6 @@
 import Vuex from 'vuex'
-import { vuexfireMutations, firestoreAction } from 'vuexfire'
-import { db } from '../firebase/firebase'
-
-const url = 'https://pokeapi.co/api/v2';
+import db from '../firebase/firebase.js' 
+import { doc, query, collection, where, getDocs, getDoc, onSnapshot, orderBy, addDoc } from "firebase/firestore";
 
 export default new Vuex.Store({
   state: {
@@ -12,18 +10,27 @@ export default new Vuex.Store({
     isLoading: false,
     muted: false,
     currentIndex: 0,
-    searchTerm: null
+    searchTerm: null,
+    secretDanceRecordSubscriber: null
   },
   mutations: {
     addNameToList: (state, name) => state.pokemonNames.push( name ),
+    updateNames: (state, names) => state.pokemonNames = names,
     addPokemonToList: (state, pokemon) => state.pokemons.push( pokemon ),
+    updatePokemons: (state, pokemons) => state.pokemons = pokemons,
+    cleanPokemons: state => state.pokemons = [],
     updateCurrentIndex: (state, newIndex ) => state.currentIndex = newIndex,
     startLoading: state => state.isLoading = true,
     stopLoading: state => state.isLoading = false,
     playAudio: state => state.muted = false,
     stopAudio: state => state.muted = true,
+    addToSecretDanceRecords: (state, record) => state.secretDanceRecords.push(record),
     updateSearchTerm: (state, newSearchTerm) => state.searchTerm = newSearchTerm,
-    ...vuexfireMutations,
+    updateSecretDanceRecordSubscriber: (state, subscriber) => state.secretDanceRecordSubscriber = subscriber,
+    unsubscribeSecretDanceRecord: state => {
+      state.secretDanceRecordSubscriber();
+      state.secretDanceRecords = [];
+    } 
   },
   getters: {
     allPokemons: state => state.pokemons,
@@ -35,38 +42,70 @@ export default new Vuex.Store({
     secretDanceRecords: state => state.secretDanceRecords
   },
   actions: {
-    bindSecretDanceRecords: firestoreAction(({ bindFirestoreRef }) => {
-      return bindFirestoreRef('secretDanceRecords', db.collection('secretDanceRecords'));
-    }),
-    saveSecretDanceRecords: firestoreAction((_, data) => {
-      return db.collection('secretDanceRecords').add(data);
-    }),
-    async populatePokemons( context ) {
+    async updatePokemons( context ) {
 
-      return await fetch(`${url}/pokemon?limit=1000`)
-        .then( async response => {
-          const data = await response.json();
+      context.commit('cleanPokemons');
+      let currentIndex = context.getters['currentIndex'];
 
-          for (let i in data.results) {
-            fetch(`${url}/pokemon/${data.results[i].name}`)
-              .then( async response => {
-                const pokemon = await response.json();
-                context.commit('addNameToList', pokemon.name);
-                context.commit('addPokemonToList', pokemon);
-              })
-          }
-        })
+      const q = query(
+        collection(db, "pokemons"),
+        where("id", "<", currentIndex + 10),
+        where("id", ">", currentIndex)
+      );
+
+      const pokemonsSnapshot = await getDocs(q);
+      const pokemonsList = pokemonsSnapshot.docs.map(doc => doc.data());
+      context.commit('updatePokemons', pokemonsList);
+    },
+    async updatePokemonsByType( context, filters ) {
+
+      context.commit('cleanPokemons');
+
+      let filtersQuery;
+
+      for (let filter in filters) {
+        filtersQuery += where("types.type.name", "==", filters[filter])
+      }
+      
+      const q = query(
+        collection(db, "pokemons"),
+        filtersQuery
+      );
+
+      console.log(q);
+    },
+    async populatePokemonNames( context ) {
+      const q = query(
+        collection(db, 'pokemonNames')
+      );
+
+      const pokemonsSnapshot = await getDocs(q);
+      const pokemonsList = pokemonsSnapshot.docs.map(doc => doc.data());
+
+      context.commit('updateNames', pokemonsList[0].allNames);
     },
     async getPokemon(_, id ) {
-      let pokemon;
-      await fetch(`${url}/pokemon/${id}`)
-        .then( async response => {
-          pokemon = await response.json();
-        })
-        .catch(error => {
-          return error;
-        })
-      return pokemon;
+      const pokemonRef = doc(db, 'pokemons', id.toString());
+      const pokemonSnapshot = await getDoc(pokemonRef);
+
+      return pokemonSnapshot.data();
+    },
+    async subscribeDanceRecords( context ) {
+      const q = query(collection(db, 'secretDanceRecords'), orderBy('record', 'desc'));
+
+      context.commit('updateSecretDanceRecordSubscriber', onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+              context.commit('addToSecretDanceRecords', change.doc.data());
+          }
+        });
+      }));
+    },
+    async unsubscribeDanceRecords( context ) {
+      context.commit('unsubscribeSecretDanceRecord');
+    },
+    async saveSecretDanceRecords(_, data) {
+      await addDoc(collection(db, "secretDanceRecords"), data);
     },
     startLoading( context ) {
       context.commit('startLoading');

@@ -29,10 +29,6 @@ export default {
       ]
     }
   },
-  beforeMount() {
-    this.$store.dispatch('startLoading');
-    this.$store.dispatch("populatePokemons");
-  },
   methods: {
     goBack() {
       this.makeSlideAnimation('left-disappear');
@@ -59,16 +55,6 @@ export default {
   computed: {
     currentRouteName() {
         return this.$route.name;
-    },
-    pokemonsLenght() {
-      return this.$store.getters['allPokemons'].length;
-    }
-  },
-  watch: {
-    pokemonsLenght() {
-      if(this.pokemonsLenght == 1000){
-        this.$store.dispatch('stopLoading');
-      }
     }
   }
 }

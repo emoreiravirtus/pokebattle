@@ -1,7 +1,8 @@
 <template>
     <div class="pokecard" :style="[cssVars]" @click="spotlightPokemon">
         <div class="image-container">
-            <img :src="pokemon.sprites.front_default" :alt="pokemon.name + 'image'">
+            <img v-if="pokemon.sprites.front_default" :src="pokemon.sprites.front_default">
+            <img id="question-image" v-else src="@/assets/question-icon.png">
         </div>
         <div class="info-container">
             <p class="bold-font white-color">{{ pokemon.name }}</p>
@@ -96,9 +97,15 @@ export default {
         background-color: #fff;
         text-align: center;
         border-radius: 8px 0 0 8px;
-
+        
         img {
             transition: all .8s;
+        }
+
+        #question-image {
+            width: 22px;
+            height: 31px;
+            margin: 33px;
         }
     }
 

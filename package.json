@@ -10,13 +10,10 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
-    "firebase": "^8.10.1-2022028193537",
-    "pokemon": "^2.3.0",
+    "firebase": "^9.4.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
-    "vuefire": "^3.0.0-alpha.2",
-    "vuex": "^4.0.0-0",
-    "vuexfire": "^3.2.5"
+    "vuex": "^4.0.0-0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

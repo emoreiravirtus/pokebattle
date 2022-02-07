@@ -58,10 +58,7 @@ export default {
   },
   mounted() {
     let userName = localStorage.getItem('userName');
-    if(userName) this.userName = userName;
-    else {
-      localStorage.setItem('userName', 'PokeMaster')
-    }
+    if(userName) this.userName = userName
   },
   methods: {
     updateUserName() {
