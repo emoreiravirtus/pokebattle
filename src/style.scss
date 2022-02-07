@@ -3,6 +3,14 @@
 $primary-color: #2196f3;
 $font-color: rgb(66, 66, 66);
 
+#app {
+    top: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 a {
     text-decoration: none;
     color: $primary-color;

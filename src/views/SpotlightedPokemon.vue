@@ -38,6 +38,19 @@
                         </span>
                     </div>
                 </div>
+                <div class="evolutions-container" v-if="selectedTab == 'evolutions'">
+                    <div class="time-line">
+                        <div id="step" v-for="(pokemon, index) in (evolutions.length - 1)" :key="index"></div>
+                    </div>
+                    <div>
+                        <pokecard
+                            v-for="(pokemon, index) in evolutions"
+                            :key="index"
+                            :pokemon="pokemon"
+                            :indexNumber="index"
+                        ></pokecard>
+                    </div>
+                </div>
             </div>
         </div>
         <audio id="PokemonCry">
@@ -49,28 +62,34 @@
 <script>
 import { colorsEnum } from '@/utils/colors.js'
 import ProgressBar from '@/components/ProgressBar.vue';
+import Pokecard from "@/components/Pokecard.vue";
 
 export default {
     name: 'SpotlightedPokemon',
     components: {
-        ProgressBar
+        ProgressBar,
+        Pokecard
     },
     data() {
         return {
             pokemon: null,
+            evolutions: null,
             cried: false,
             selectedTab: 'general',
             tabs: [
                 'general',
-                'sprites',
-                'evolution'
+                'evolutions',
+                'sprites'
             ]
         }
     },
-    async beforeCreate() {
+    async beforeMount() {
         this.$store.dispatch('startLoading');
-        this.pokemon = await this.$store.dispatch('getPokemon', this.$route.params.id)
-            .then(this.$store.dispatch('stopLoading'));
+        this.pokemon = await this.$store.dispatch('getPokemon', this.$route.params.id);
+        this.evolutions = await this.$store.dispatch('getEvolutions', this.$route.params.id)
+        setTimeout(() => {
+            this.$store.dispatch('stopLoading')
+        }, 1000);
     },
     methods: {
         cry() {
@@ -80,10 +99,6 @@ export default {
             }, 2000);
             let player = new Audio(this.pokemonCry);
             player.play();
-        },
-        turnSpotlightOff() {
-            document.querySelector('html').style.overflow = 'unset';
-            this.$store.dispatch('turnSpotlightOff');
         },
         changeSelectedTab(newTab) {
             this.selectedTab = newTab;
@@ -106,6 +121,13 @@ export default {
                 '--type-color': colorsEnum[pokemonType]
             }
         }
+    },
+    watch: {
+    async '$route.params'() {
+        this.pokemon = await this.$store.dispatch('getPokemon', this.$route.params.id);
+        this.evolutions = await this.$store.dispatch('getEvolutions', this.$route.params.id);
+        this.selectedTab = 'general'
+    }
     }
 }
 </script>
@@ -113,8 +135,8 @@ export default {
 <style lang="scss">
 
 .spotlighted-pokemon-container {
-    position: fixed;
     background-color: #fff;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;
@@ -123,6 +145,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+    margin-bottom: 20px;
 
     .pokemon-wave{
         position: absolute;
@@ -266,6 +289,51 @@ export default {
 
                 & > * {
                     margin: 0 22px;
+                }
+            }
+        }
+
+        .evolutions-container {
+            display: flex;
+            height: 70vh;
+
+            .time-line {
+                padding: 20px;
+                margin-top: 43px;
+            
+                #step {
+                    height: 100px;
+                    width: 7px;
+                    background: var(--type-color);
+                    border-radius: 10px;
+                    position: relative;
+                    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+                }
+
+                #step::before {
+                    content: "";
+                    width: 15px;
+                    height: 15px;
+                    background: white;
+                    top: -9px;
+                    left: -8px;
+                    border-radius: 20px;
+                    border: 4px solid var(--type-color);
+                    position: absolute;
+                    box-shadow: rgb(100 100 111) 0px 7px 29px 0px;
+                }
+
+                #step:last-child::after {
+                    content: "";
+                    width: 15px;
+                    height: 15px;
+                    background: white;
+                    bottom: -21px;
+                    left: -8px;
+                    border-radius: 20px;
+                    border: 4px solid var(--type-color);
+                    position: absolute;
+                    box-shadow: rgb(100 100 111) 0px 7px 29px 0px;
                 }
             }
         }

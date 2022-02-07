@@ -90,6 +90,26 @@ export default new Vuex.Store({
 
       return pokemonSnapshot.data();
     },
+    async getEvolutions(_, id) {
+      let q = query(collection(db, 'evolutions'),
+        where('chain', 'array-contains', Number(id)));
+
+      const querySnapshot = await getDocs(q);
+      
+      let pokemonChain = [];
+
+      await querySnapshot.forEach(async (d) => {
+
+        for (let i in d.data().chain) {
+          const pokemonRef = doc(db, 'pokemons', d.data().chain[i].toString());
+          const pokemonSnapshot = await getDoc(pokemonRef);
+
+          pokemonChain.push(pokemonSnapshot.data());
+        }
+      });
+
+      return pokemonChain;
+    },
     async subscribeDanceRecords( context ) {
       const q = query(collection(db, 'secretDanceRecords'), orderBy('record', 'desc'));
 

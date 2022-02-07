@@ -52,7 +52,6 @@ export default {
         spotlightPokemon() {
             document.querySelectorAll('.pokecard img')[this.indexNumber].style = 'animation: 2s ease-in breath infinite';
             setTimeout(() => {
-                this.$store.dispatch('startLoading');
                 this.$router.push({name: 'SpotlightedPokemon', params: { id: this.pokemon.id} })
                 document.querySelectorAll('.pokecard img')[this.indexNumber].style = 'animation: unset';
             }, 1000);
