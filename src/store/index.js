@@ -1,6 +1,6 @@
 import Vuex from 'vuex'
 import db from '../firebase/firebase.js' 
-import { doc, query, collection, where, getDocs, getDoc, onSnapshot, orderBy, addDoc } from "firebase/firestore";
+import { doc, query, collection, where, getDocs, getDoc, onSnapshot, orderBy, addDoc, limit } from "firebase/firestore";
 
 export default new Vuex.Store({
   state: {
@@ -111,7 +111,7 @@ export default new Vuex.Store({
       return pokemonChain;
     },
     async subscribeDanceRecords( context ) {
-      const q = query(collection(db, 'secretDanceRecords'), orderBy('record', 'desc'));
+      const q = query(collection(db, 'secretDanceRecords'), orderBy('record', 'desc'), limit(7));
 
       context.commit('updateSecretDanceRecordSubscriber', onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {

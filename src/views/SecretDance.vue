@@ -25,8 +25,10 @@
     </div>
     <div class="modal" v-else>
       <button class="bold-font success-background" @click="startGame">Start Game</button>
-      <p class="bold-font white-color">World Records</p>
       <table>
+        <tr>
+          <th class="bold-font">Secret Dance's Top 7 Records</th>
+        </tr>
         <tr class="bold-font" v-if="records.length">
           <th>Master Name</th>
           <th>Points</th>
