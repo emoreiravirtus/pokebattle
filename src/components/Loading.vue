@@ -27,7 +27,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("https://www.transparenttextures.com/patterns/maze-white.png"), linear-gradient(160deg, red 0%, rgb(72, 0, 96) 100%);
+    background-image: url("../assets/maze-white.png"), linear-gradient(160deg, red 0%, rgb(72, 0, 96) 100%);
     z-index: 10;
     
     .image-container {

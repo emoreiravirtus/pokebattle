@@ -311,7 +311,7 @@ export default {
     align-items: center;
     justify-content: space-around;
     background-color: #795548;
-    background-image: url("https://www.transparenttextures.com/patterns/maze-white.png");
+    background-image: url("../assets/maze-white.png");
 
     table {
       height: 100px;

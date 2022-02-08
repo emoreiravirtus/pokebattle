@@ -20,7 +20,7 @@
                 @click="toggleType(index, type[Object.keys(type)[0]])"
                 :class="{'active': type[Object.keys(type)[0]]}">
                 <div class="circle"
-                    :style="{'background-image': 'url(' + diamondsImage + '), linear-gradient(160deg, ' + colorsByType[Object.keys(type)[0]] + ' 0%, rgb(72, 0, 96) 100%)'}">
+                    :style="{'background-image': 'url(' + textureImage + '), linear-gradient(160deg, ' + colorsByType[Object.keys(type)[0]] + ' 0%, rgb(72, 0, 96) 100%)'}">
                 </div>
                 <p class="normal-font">{{ Object.keys(type)[0] }}</p>
                 </div>
@@ -32,7 +32,7 @@
 
 <script>
 import { colorsEnum } from '@/utils/colors.js';
-import diamondsImage from '@/assets/diagmonds.png'
+import textureImage from '@/assets/maze-white.png'
 
 export default {
     name: 'FilterWiki',
@@ -104,8 +104,8 @@ export default {
       colorsByType(){
         return colorsEnum;
       },
-      diamondsImage(){
-        return diamondsImage;
+      textureImage(){
+        return textureImage;
       }
     }
 }

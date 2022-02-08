@@ -38,9 +38,7 @@ export default {
     cursor: pointer;
     transition: transform .4s;
     z-index: 0;
-
-    background-image: url("../assets/diagmonds.png"), linear-gradient(160deg, var(--type-color) 0%, rgb(72, 0, 96) 100%);
-
+    
     &:hover {
         transform: scale(1.1);
     }
