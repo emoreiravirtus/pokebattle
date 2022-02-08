@@ -310,8 +310,8 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
-    background-color: #2196f3;
-    background-image: url("../assets/diagmonds.png");
+    background-color: #795548;
+    background-image: url("https://www.transparenttextures.com/patterns/maze-white.png");
 
     table {
       height: 100px;

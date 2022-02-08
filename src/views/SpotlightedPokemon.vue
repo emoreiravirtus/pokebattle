@@ -9,7 +9,7 @@
                 <p class="big-font special-font centralize-text" :style="{'background-image': gradientColor }">{{ pokemon.name }}</p>
             <ul class="normal-font white-color centralize-text">
                 <li v-for="(tab, index) of tabs" :key="index" @click="changeSelectedTab(tab)" 
-                    :class="{'active': tab == selectedTab, 'darker': tab != selectedTab}">
+                    :class="{'active': tab == selectedTab}">
                     {{ tab }}
                 </li>
             </ul>
@@ -38,7 +38,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="evolutions-container" v-if="selectedTab == 'evolutions'">
+                <div class="evolutions-container" v-if="selectedTab == 'evolution chain' && evolutions.length > 1">
                     <div class="time-line">
                         <div id="step" v-for="(pokemon, index) in (evolutions.length - 1)" :key="index"></div>
                     </div>
@@ -50,6 +50,9 @@
                             :indexNumber="index"
                         ></pokecard>
                     </div>
+                </div>
+                <div class="evolutions-container" v-if="selectedTab == 'evolution chain' && evolutions.length <= 1">
+                    <p class="bold-font">{{ pokemon.name }} has no evolution chain</p>
                 </div>
             </div>
         </div>
@@ -78,7 +81,7 @@ export default {
             selectedTab: 'general',
             tabs: [
                 'general',
-                'evolutions',
+                'evolution chain',
                 'sprites'
             ]
         }
@@ -152,7 +155,7 @@ export default {
         width: 100%;
         height: 331px;
         background-color: var(--type-color);
-        background-image: url("../assets/diagmonds.png"), linear-gradient(160deg, var(--type-color) 0%, rgb(72, 0, 96) 100%);
+        background-image: url("https://www.transparenttextures.com/patterns/inspiration-geometry.png"), linear-gradient(160deg, var(--type-color) 0%, rgb(72, 0, 96) 100%);
         top: 0;
         z-index: -1;
         clip-path: ellipse(100% 55% at 48% 44%);
@@ -197,6 +200,11 @@ export default {
         
         .active {
             z-index: 3;
+            background-color: white;
+            color: var(--type-color);
+            border-top: 3px solid var(--type-color);
+            border-right: 3px solid var(--type-color);
+            border-left: 3px solid var(--type-color);
         }
 
         li {
@@ -207,34 +215,8 @@ export default {
             border-radius: 18px 18px 0 0;
             position: relative;
             background-color: var(--type-color);
-            margin: 0 16px;
+            margin: 0 2px;
             z-index: 2;
-
-            &:before,
-            &:after {
-            content: " ";
-                position: absolute;
-                top: 0;
-                width: 23px;
-                height: 100%;
-                background-color: inherit;
-                transform: translate3d(1px);
-                z-index: -1;
-            }
-
-            &:before {
-                border-radius: 12px 0 0 0;
-                transform: skew(-24deg);
-                left: -13px;
-            }
-
-            &:after {
-                border-radius: 0 12px 0 0;
-                transform: skew(24deg);
-                right: -13px;
-                border-right: 1px solid inherit;
-                z-index: 1;
-            }
         }
     }
 
