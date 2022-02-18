@@ -53,7 +53,7 @@ export default {
   methods: {
     previousPage() {
       if (this.currentIndex == 0) {
-        this.$store.dispatch('updateCurrentIndex', 1110);
+        this.$store.dispatch('updateCurrentIndex', this.maxIndex);
       }
       else {
         this.$store.dispatch('updateCurrentIndex', this.currentIndex - 10);
@@ -61,7 +61,7 @@ export default {
       this.$store.dispatch('updatePokemons');
     },
     nextPage() {
-      if (this.currentIndex == 1110) {
+      if (this.currentIndex == this.maxIndex) {
         this.$store.dispatch('updateCurrentIndex', 0);
       }
       else {
@@ -78,6 +78,9 @@ export default {
     }
   },
   computed: {
+    maxIndex() {
+      return this.$store.getters["maxIndex"];
+    },
     pokemons() {
       return this.$store.getters["allPokemons"];
     },

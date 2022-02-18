@@ -99,7 +99,8 @@ export default {
       },
       async addProperties() {
         let random = Math.floor(Math.random() * (1117 - 1) + 1);
-        this.secretPokemon = await this.$store.dispatch('getPokemon', random)
+        this.secretPokemon = await this.$store.dispatch('getPokemonWithImage', random)
+        console.log(this.secretPokemon);
         this.addOptions();
       },
       addOptions() {
@@ -134,7 +135,7 @@ export default {
         if(option == this.secretPokemon.name) {
           this.points += 375 * this.multiplier;
 
-          if(this.multiplier >= 3) {
+          if(this.multiplier >= 4) {
             this.hearts++;
           }
 
@@ -151,13 +152,14 @@ export default {
         this.lastPoints = this.points;
         this.options = [];
         this.hidden = true;
-
         if(this.hearts != 0){
           this.addProperties();
         }
         else {
           this.gameStarted = false;
           this.saveRecord();
+          this.points = 0
+          this.record = 0;
         }
       },
       hasDuplicates(array) {

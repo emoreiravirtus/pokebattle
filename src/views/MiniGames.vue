@@ -30,7 +30,7 @@ export default {
             {
             name: 'Tik tak toe',
             image: tikTakToeImage,
-            route: '/',
+            route: '/mini-games',
             enabled: false
             }
         ]

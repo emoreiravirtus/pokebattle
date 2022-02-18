@@ -29,6 +29,8 @@ export default {
       ]
     }
   },
+  mounted() {
+  },
   methods: {
     goBack() {
       this.makeSlideAnimation('left-disappear');

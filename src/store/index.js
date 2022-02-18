@@ -1,6 +1,6 @@
 import Vuex from 'vuex'
 import db from '../firebase/firebase.js' 
-import { doc, query, collection, where, getDocs, getDoc, onSnapshot, orderBy, addDoc, limit } from "firebase/firestore";
+import { doc, query, collection, where, getDocs, getDoc, onSnapshot, updateDoc, setDoc, orderBy, addDoc, limit } from "firebase/firestore";
 
 export default new Vuex.Store({
   state: {
@@ -11,7 +11,8 @@ export default new Vuex.Store({
     muted: false,
     currentIndex: 0,
     searchTerm: null,
-    secretDanceRecordSubscriber: null
+    secretDanceRecordSubscriber: null,
+    maxIndex: 1120
   },
   mutations: {
     addNameToList: (state, name) => state.pokemonNames.push( name ),
@@ -39,7 +40,8 @@ export default new Vuex.Store({
     muted: state => state.muted,
     currentIndex: state => state.currentIndex,
     searchTerm: state => state.searchTerm,
-    secretDanceRecords: state => state.secretDanceRecords
+    secretDanceRecords: state => state.secretDanceRecords,
+    maxIndex: state => state.maxIndex
   },
   actions: {
     async updatePokemons( context ) {
@@ -56,6 +58,66 @@ export default new Vuex.Store({
       const pokemonsSnapshot = await getDocs(q);
       const pokemonsList = pokemonsSnapshot.docs.map(doc => doc.data());
       context.commit('updatePokemons', pokemonsList);
+    },
+    async syncPokemonsUpdate() {
+      
+      let startPokeAPIIndex = 10220;
+      let lastPokeAPIIndex = 10228;
+
+      let startFirebaseIndex = 1118;
+
+      for(let i = startPokeAPIIndex; i <= lastPokeAPIIndex; i++) {
+
+        const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+        const p = await r.json();
+        p.id = startFirebaseIndex;
+
+        const pokemonRef = doc(db, "pokemons", startFirebaseIndex.toString());
+        await updateDoc(pokemonRef, p);
+
+        startFirebaseIndex += 1;
+        
+      }
+    },
+    async syncPokemonsName() {
+
+      const pokemonNamesRef = doc(db, 'pokemonNames', 'allNames');
+      const pokemonNamesSnapshot = await getDoc(pokemonNamesRef);
+
+      let list = pokemonNamesSnapshot.data();
+
+      for(let i = 1000; i <= list.length; i++) {
+
+        const pokemonNamesRef = doc(db, 'pokemons', i.toString);
+        const pokemonNamesSnapshot = await getDoc(pokemonNamesRef);
+
+        let pokemon = pokemonNamesSnapshot.data();
+        list[i] = pokemon.name;
+        
+      }
+
+      const listRef = doc(db, "pokemonNames", 'allNames');
+      await updateDoc(listRef, list);
+    },
+    async syncPokemonsSet() {
+      
+      let startPokeAPIIndex = 10220;
+      let lastPokeAPIIndex = 10228;
+
+      let startFirebaseIndex = 1118;
+
+      for(let i = startPokeAPIIndex; i <= lastPokeAPIIndex; i++) {
+
+        const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+        const p = await r.json();
+        p.id = startFirebaseIndex;
+
+        const pokemonRef = doc(db, "pokemons", startFirebaseIndex.toString());
+        await setDoc(pokemonRef, p);
+
+        startFirebaseIndex += 1;
+        
+      }
     },
     async updatePokemonsByType( context, filters ) {
 
@@ -89,6 +151,23 @@ export default new Vuex.Store({
       const pokemonSnapshot = await getDoc(pokemonRef);
 
       return pokemonSnapshot.data();
+    },
+    async getPokemonWithImage(_, id ) {
+      const pokemonRef = doc(db, 'pokemons', id.toString());
+      const pokemonSnapshot = await getDoc(pokemonRef);
+
+      let pokemon = pokemonSnapshot.data();
+      
+      while(pokemon.sprites.other['official-artwork'].front_default == null) {
+        let newRandomId = Math.floor(Math.random() * (1117 - 1) + 1);
+
+        let newPokemonRef = doc(db, 'pokemons', newRandomId.toString());
+        let newPokemonSnapshot = await getDoc(newPokemonRef);
+
+        pokemon = newPokemonSnapshot.data();
+      }
+
+      return pokemon;
     },
     async getEvolutions(_, id) {
       let q = query(collection(db, 'evolutions'),
