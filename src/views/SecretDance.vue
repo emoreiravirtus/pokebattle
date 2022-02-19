@@ -99,8 +99,7 @@ export default {
       },
       async addProperties() {
         let random = Math.floor(Math.random() * (1117 - 1) + 1);
-        this.secretPokemon = await this.$store.dispatch('getPokemonWithImage', random)
-        console.log(this.secretPokemon);
+        this.secretPokemon = await this.$store.dispatch('getPokemonWithImage', random);
         this.addOptions();
       },
       addOptions() {
